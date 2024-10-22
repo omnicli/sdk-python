@@ -60,9 +60,8 @@ def _get_arg_list() -> List[str]:
     Raises:
         ArgListMissingError: If OMNI_ARG_LIST environment variable is not set.
     """
-    try:
-        arg_list_str = os.environ["OMNI_ARG_LIST"]
-    except KeyError:
+    arg_list_str = os.getenv("OMNI_ARG_LIST")
+    if arg_list_str is None:
         raise ArgListMissingError(
             "OMNI_ARG_LIST environment variable is not set. "
             'Are you sure "argparser: true" is set for this command?'
