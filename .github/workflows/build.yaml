@@ -351,7 +351,7 @@ jobs:
 
     environment:
       name: pypi
-      url: https://pypi.org/p/omnicli
+      url: https://pypi.org/p/omnicli-sdk
 
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing
