@@ -1,15 +1,15 @@
-# omnicli (sdk-python)
+# omnicli-sdk (sdk-python)
 
 Python SDK for building Omni commands.
 
 ## Overview
 
-`omnicli` is a Python package that provides functionality to help build commands that will be executed by Omni. It offers various utilities and helpers that make it easier to work with Omni's features from within Python.
+`omnicli-sdk` is a Python package that provides functionality to help build commands that will be executed by Omni. It offers various utilities and helpers that make it easier to work with Omni's features from within Python.
 
 ## Installation
 
 ```bash
-pip install omnicli
+pip install omnicli-sdk
 ```
 
 ## Features
@@ -75,8 +75,7 @@ To set up for development:
 
 ```bash
 # Clone the repository
-git clone https://github.com/omnicli/sdk-python.git
-cd omnicli
+omni clone https://github.com/omnicli/sdk-python.git
 
 # Install dependencies
 omni up
