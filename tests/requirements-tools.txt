@@ -1,0 +1,12 @@
+black
+flake8
+flake8-bugbear
+flake8-docstrings
+flake8-quotes
+flake8-simplify
+flake8-unused-arguments
+mypy
+pytest
+pytest-cov
+pytest-clarity
+pytest-subtests

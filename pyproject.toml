@@ -1,0 +1,55 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "omnicli"
+description = "Omni Python SDK"
+dynamic = ["version"]
+dependencies = []
+requires-python = ">=3.8"
+authors = [
+  {name = "Raphaël Beamonte", email = "raphael.beamonte@gmail.com"},
+]
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["omni", "omnicli", "sdk"]
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  "Development Status :: 4 - Beta",
+
+  # Indicate who your project is intended for
+  "Intended Audience :: Developers",
+
+  # Pick your license as you wish (see also "license" above)
+  "License :: OSI Approved :: MIT License",
+
+  # Specify the Python versions you support here.
+  "Programming Language :: Python :: 3",
+]
+
+[project.urls]
+Homepage = "https://omnicli.dev"
+Documentation = "https://omnicli.dev"
+Repository = "https://github.com/omnicli/sdk-python.git"
+Issues = "https://github.com/omnicli/sdk-python/issues"
+Changelog = "https://github.com/omnicli/sdk-python/commits/main/"
+
+[tool.hatch.version]
+path = "lib/omnicli/version.py"
+
+[tool.hatch.build]
+skip-excluded-dirs = true
+
+[tool.hatch.build.targets.sdist]
+packages = ["lib/omnicli"]
+only-include = ["lib/omnicli"]
+sources = ["lib"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["lib/omnicli"]
+only-include = ["lib/omnicli"]
+sources = ["lib"]
