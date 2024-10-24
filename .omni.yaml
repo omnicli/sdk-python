@@ -20,7 +20,7 @@ commands:
       set -e
       omni test lint
       omni test mypy
-      omni test blake
+      omni test black
       omni test unit
     subcommands:
       lint:
@@ -29,7 +29,7 @@ commands:
       mypy:
         desc: Run mypy
         run: mypy lib/ tests/
-      blake:
+      black:
         desc: Run black
         run: black --check lib/ tests/
       unit:
