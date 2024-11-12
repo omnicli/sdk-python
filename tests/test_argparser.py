@@ -128,6 +128,29 @@ def test_string_array_defaults():
 
 
 @pytest.mark.usefixtures("clean_env")
+def test_string_array_group_occurrences():
+    """Should group array values correctly."""
+    os.environ["OMNI_ARG_LIST"] = "words"
+    os.environ["OMNI_ARG_WORDS_TYPE"] = "str/3/2"
+    os.environ["OMNI_ARG_WORDS_TYPE_0"] = "str/2"
+    os.environ["OMNI_ARG_WORDS_VALUE_0_0"] = "val1"
+    os.environ["OMNI_ARG_WORDS_VALUE_0_1"] = "val2"
+    os.environ["OMNI_ARG_WORDS_TYPE_1"] = "str/1"
+    os.environ["OMNI_ARG_WORDS_VALUE_1_0"] = "val3"
+    os.environ["OMNI_ARG_WORDS_TYPE_2"] = "str/3"
+    os.environ["OMNI_ARG_WORDS_VALUE_2_0"] = "val4"
+    os.environ["OMNI_ARG_WORDS_VALUE_2_1"] = "val5"
+    os.environ["OMNI_ARG_WORDS_VALUE_2_2"] = "val6"
+
+    args = parse_args()
+    assert args.words == [
+        ["val1", "val2"],
+        ["val3"],
+        ["val4", "val5", "val6"],
+    ]
+
+
+@pytest.mark.usefixtures("clean_env")
 def test_boolean_values():
     """Should handle boolean values correctly."""
 
