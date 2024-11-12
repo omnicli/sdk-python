@@ -21,11 +21,30 @@ from .errors import (
 
 
 def _parse_type_info(type_str: str) -> Tuple[str, Optional[int]]:
-    """Parse the type string into base type and array size if present."""
-    if "/" in type_str:
-        base_type, size = type_str.split("/")
-        return base_type, int(size)
-    return type_str, None
+    """
+    Parse the type string into base type and array size if present.
+
+    This can be in the shape:
+        <type> for a single value
+        <type>/<size> for an array
+        <type>/<size>/<max_values> for grouped occurrences
+
+    Args:
+        type_str (str): The type string to parse.
+
+    Returns:
+        Tuple[str, Optional[int], bool]: The base type, array size and
+        whether the occurrences are grouped.
+    """
+    parts = (type_str.split("/") + [None, None])[:3]
+    base_type, size, group_occurrences = parts
+
+    if size is not None:
+        size = int(size)
+
+    group_occurrences = group_occurrences is not None
+
+    return base_type, size, group_occurrences
 
 
 def _convert_value(value: str, type_name: str) -> Any:
@@ -70,9 +89,15 @@ def _get_arg_list() -> List[str]:
     return [arg.lower() for arg in arg_list_str.split()]
 
 
-def _get_arg_type(arg_name: str) -> Optional[Tuple[str, Optional[int]]]:
+def _get_arg_type(
+    arg_name: str, index: Optional[int] = None
+) -> Optional[Tuple[str, Optional[int], bool]]:
     """Get the type of the argument from the environment variables."""
-    type_str = os.getenv(f"OMNI_ARG_{arg_name.upper()}_TYPE")
+    key = f"OMNI_ARG_{arg_name.upper()}_TYPE"
+    if index is not None:
+        key = f"{key}_{index}"
+
+    type_str = os.getenv(key)
     if type_str is None:
         return None
 
@@ -80,12 +105,14 @@ def _get_arg_type(arg_name: str) -> Optional[Tuple[str, Optional[int]]]:
 
 
 def _get_arg_value(
-    arg_name: str, arg_type: str, index: Optional[int] = None
+    arg_name: str, arg_type: str, index1: Optional[int] = None, index2: Optional[int] = None
 ) -> Optional[str]:
     """Get the value of the argument from the environment variables."""
     key = f"OMNI_ARG_{arg_name.upper()}_VALUE"
-    if index is not None:
-        key = f"{key}_{index}"
+    if index1 is not None:
+        key = f"{key}_{index1}"
+        if index2 is not None:
+            key = f"{key}_{index2}"
 
     value = os.getenv(key)
     if value is None:
@@ -124,15 +151,34 @@ def parse_args() -> Namespace:
             args_dict[arg_name] = None
             continue
 
-        base_type, array_size = arg_type
+        base_type, array_size, group_occurrences = arg_type
 
         if array_size is not None:
-            # If the argument is an array, we need to get each value
-            # and store it in a list; we keep the "None" values if any
-            # since the array has provided a size and we just follow it
-            args_dict[arg_name] = [
-                _get_arg_value(arg_name, base_type, idx) for idx in range(array_size)
-            ]
+            if group_occurrences:
+                # If occurrences are grouped, we need to recompose a nested
+                # array since we will have two levels, we also need to get
+                # the number of values for each group
+                values = []
+                for group_idx in range(array_size):
+                    _, group_size, _ = _get_arg_type(arg_name, group_idx)
+                    if group_size is None or group_size == 0:
+                        values.append([])
+                    else:
+                        values.append(
+                            [
+                                _get_arg_value(arg_name, base_type, group_idx, idx)
+                                for idx in range(group_size)
+                            ]
+                        )
+                args_dict[arg_name] = values
+            else:
+                # If the argument is an array, we need to get each value
+                # and store it in a list; we keep the "None" values if any
+                # since the array has provided a size and we just follow it
+                args_dict[arg_name] = [
+                    _get_arg_value(arg_name, base_type, idx)
+                    for idx in range(array_size)
+                ]
         else:
             # If the argument is not an array, we just get the value
             args_dict[arg_name] = _get_arg_value(arg_name, base_type)

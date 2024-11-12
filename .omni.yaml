@@ -20,7 +20,7 @@ commands:
       set -e
       omni test lint
       omni test mypy
-      omni test black
+      omni test ruff
       omni test unit
     subcommands:
       lint:
@@ -29,9 +29,9 @@ commands:
       mypy:
         desc: Run mypy
         run: mypy lib/ tests/
-      black:
-        desc: Run black
-        run: black --check lib/ tests/
+      ruff:
+        desc: Run ruff
+        run: ruff check lib/ tests/
       unit:
         desc: Run unit and integration tests
         run: pytest --cache-clear tests/ "$@"

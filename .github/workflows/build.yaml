@@ -55,9 +55,9 @@ jobs:
         with:
           files_yaml: |
             source_code:
-              lib/**
-              tests/**
-              .github/workflows/build.yaml
+              - 'lib/**'
+              - 'tests/**'
+              - '.github/workflows/build.yaml'
 
       - name: Identify if testing is required
         if: ${{ env.REQUIRES_TESTS != 'true' }}
@@ -146,7 +146,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-  black:
+  ruff:
     name: Checking code formatting
     runs-on: ubuntu-latest
 
@@ -159,8 +159,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run black
-        uses: psf/black@stable
+      - name: Run ruff
+        uses: astral-sh/ruff-action@v1
 
 
   tests:
@@ -271,7 +271,7 @@ jobs:
     needs:
       - flake8
       - mypy
-      - black
+      - ruff
       - tests
 
     if: always()
@@ -285,8 +285,8 @@ jobs:
         if: needs.mypy.result == 'failure'
         run: exit 1
 
-      - name: Fail if black failed
-        if: needs.black.result == 'failure'
+      - name: Fail if ruff failed
+        if: needs.ruff.result == 'failure'
         run: exit 1
 
       - name: Fail if tests failed
