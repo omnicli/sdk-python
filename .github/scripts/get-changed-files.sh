@@ -6,6 +6,21 @@ set -e
 BASE_SHA=${BASE_SHA:-HEAD^}
 GITHUB_OUTPUT=${GITHUB_OUTPUT:-/dev/null}
 
+# Check if the repository is shallow
+if git rev-parse --is-shallow-repository >/dev/null 2>&1; then
+    # Keep unshallowing by chunks of 100 commits until we reach the BASE_SHA
+    # or we run out of commits
+    while ! git rev-parse --verify "$BASE_SHA" >/dev/null 2>&1; do
+        echo >&2 "Unshallowing repository to find $BASE_SHA..."
+        git fetch --depth 100
+    done
+
+    if ! git rev-parse --verify "$BASE_SHA" >/dev/null 2>&1; then
+        echo >&2 "Error: $BASE_SHA is not a valid git reference"
+        exit 1
+    fi
+fi
+
 # Function to check if any files matching patterns were modified/changed/deleted
 check_patterns() {
     local result=false
