@@ -8,6 +8,8 @@ GITHUB_OUTPUT=${GITHUB_OUTPUT:-/dev/null}
 
 # Check if the repository is shallow
 echo "IS REPO SHALLOW? $(git rev-parse --is-shallow-repository)"
+echo "IS COMMIT AVAILABLE? $(git rev-parse --verify "$BASE_SHA" 2>&1), $(git rev-parse --verify "$BASE_SHA" 2>&1 && echo "true" || echo "false")"
+
 MAX_UNSHALLOW_DEPTH=${MAX_UNSHALLOW_DEPTH:-1000}
 if [[ "$(git rev-parse --is-shallow-repository)" == "true" ]]; then
     DEPTH=0
