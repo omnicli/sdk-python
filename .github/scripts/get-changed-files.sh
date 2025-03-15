@@ -7,12 +7,20 @@ BASE_SHA=${BASE_SHA:-HEAD^}
 GITHUB_OUTPUT=${GITHUB_OUTPUT:-/dev/null}
 
 # Check if the repository is shallow
+echo "IS REPO SHALLOW? $(git rev-parse --is-shallow-repository)"
+MAX_UNSHALLOW_DEPTH=${MAX_UNSHALLOW_DEPTH:-1000}
 if [[ "$(git rev-parse --is-shallow-repository)" == "true" ]]; then
+    DEPTH=0
+    STEP=100
+    CUR_STEP=0
+
     # Keep unshallowing by chunks of 100 commits until we reach the BASE_SHA
     # or we run out of commits
-    while ! git rev-parse --verify "$BASE_SHA" >/dev/null 2>&1; do
-        echo >&2 "Unshallowing repository to find $BASE_SHA..."
-        git fetch --depth 100
+    while [[ $CUR_STEP -lt $MAX_UNSHALLOW_DEPTH ]] && \
+            ! git rev-parse --verify "$BASE_SHA" >/dev/null 2>&1; do
+        CUR_STEP=$((CUR_STEP + STEP))
+        echo >&2 "Unshallowing repository to find $BASE_SHA... (depth: $CUR_STEP)"
+        git fetch --depth "$CUR_STEP"
     done
 
     if ! git rev-parse --verify "$BASE_SHA" >/dev/null 2>&1; then
