@@ -7,7 +7,7 @@ BASE_SHA=${BASE_SHA:-HEAD^}
 GITHUB_OUTPUT=${GITHUB_OUTPUT:-/dev/null}
 
 # Check if the repository is shallow
-if git rev-parse --is-shallow-repository >/dev/null 2>&1; then
+if [[ "$(git rev-parse --is-shallow-repository >/dev/null 2>&1)" == "true" ]]; then
     # Keep unshallowing by chunks of 100 commits until we reach the BASE_SHA
     # or we run out of commits
     while ! git rev-parse --verify "$BASE_SHA" >/dev/null 2>&1; do
